@@ -1,0 +1,2 @@
+wwwroot\Files\Images\default.jpg
+wwwroot\Files\Images\default.png
