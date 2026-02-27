@@ -1,11 +1,10 @@
-using System.Text;
+ï»¿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.EntityFrameworkCore;
 using api_netcore.Data;
 using Microsoft.OpenApi.Models;
 using api_netcore;
-
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +13,7 @@ if (!string.IsNullOrEmpty(urls))
 {
     builder.WebHost.UseUrls(urls);
 }
+
 // Configurar logging
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -38,11 +38,11 @@ builder.Services.AddCors(options =>
     });
 });
 
-// Configurar conexión a la base de datos
+// Configurar conexiÃ³n a la base de datos
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("connection")));
 
-// Configurar autenticación JWT
+// Configurar autenticaciÃ³n JWT
 var key = builder.Configuration["Jwt:Key"] ?? throw new InvalidOperationException("JWT Key not configured");
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(opt =>
@@ -62,24 +62,23 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
 // Configurar Swagger
 builder.Services.AddEndpointsApiExplorer();
-// Configurar Swagger
 builder.Services.AddSwaggerGen(c =>
 {
     c.SwaggerDoc("v1", new OpenApiInfo
     {
         Title = "API NetCore",
         Version = "v1",
-        Description = "API para gestión de empleados y empresas"
+        Description = "API para gestiÃ³n de empleados y empresas"
     });
 
-    // Configuración para IFormFile
+    // ConfiguraciÃ³n para IFormFile
     c.MapType<IFormFile>(() => new OpenApiSchema
     {
         Type = "string",
         Format = "binary"
     });
 
-    // Operación para subida de archivos
+    // OperaciÃ³n para subida de archivos
     c.OperationFilter<FileUploadOperation>();
 
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
@@ -128,7 +127,12 @@ if (app.Environment.IsDevelopment() || app.Environment.IsProduction())
     app.UseDeveloperExceptionPage();
 }
 
-app.UseHttpsRedirection();
+// âœ… SOLO usar redirecciÃ³n HTTPS en desarrollo (NO en producciÃ³n)
+if (app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseCors("AllowAll");
 app.UseStaticFiles();
 app.UseAuthentication();
@@ -147,8 +151,6 @@ if (!Directory.Exists(imagesPath))
 var defaultImagePath = Path.Combine(imagesPath, "default.png");
 if (!System.IO.File.Exists(defaultImagePath))
 {
-    // Crear una imagen default simple o copiar de recursos
-    // Por ahora solo creamos un archivo vacío
     System.IO.File.WriteAllText(defaultImagePath, "");
 }
 
