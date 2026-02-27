@@ -9,6 +9,11 @@ using api_netcore;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var urls = Environment.GetEnvironmentVariable("ASPNETCORE_URLS");
+if (!string.IsNullOrEmpty(urls))
+{
+    builder.WebHost.UseUrls(urls);
+}
 // Configurar logging
 builder.Logging.ClearProviders();
 builder.Logging.AddConsole();
@@ -104,11 +109,7 @@ builder.Services.AddSwaggerGen(c =>
 });
 
 builder.Services.AddAuthorization();
-// Configurar para escuchar en todas las interfaces
-if (builder.Environment.IsProduction())
-{
-    builder.WebHost.UseUrls("https://0.0.0.0:5081");
-}
+
 var app = builder.Build();
 
 var enableSwagger = app.Configuration.GetValue<bool>("SwaggerSettings:EnableSwagger", true);
